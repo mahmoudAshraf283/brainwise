@@ -53,6 +53,21 @@ def logout(request):
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    """Login"""
+    """Login with user data included in response"""
     serializer_class = CustomTokenObtainPairSerializer
+    
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        
+        if response.status_code == 200:
+            # Get the user from the validated data
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                user = serializer.user
+                user_data = UserSerializer(user).data
+                
+                # Add user data to the response
+                response.data['user'] = user_data
+                
+        return response
 
