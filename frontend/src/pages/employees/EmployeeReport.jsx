@@ -352,15 +352,6 @@ const EmployeeReport = () => {
               <strong>Total Hired Employees:</strong> {employees.length}
             </div>
             <div>
-              <strong>Average Days Employed:</strong>{' '}
-              {Math.round(
-                employees
-                  .filter(emp => emp.days_employed !== null)
-                  .reduce((acc, emp) => acc + emp.days_employed, 0) / 
-                employees.filter(emp => emp.days_employed !== null).length
-              ) || 0} days
-            </div>
-            <div>
               <strong>Companies Represented:</strong>{' '}
               {new Set(employees.map(emp => emp.company_name)).size}
             </div>

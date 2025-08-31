@@ -1,6 +1,17 @@
 # 🧠 BrainWise Employee Management System
 
-A comprehensive full-stack employee management system built with Django REST Framework and React, featuring role-based access control, JWT authentication, and modern UI/UX design.
+A comprehensiv## 📋 Table of Contents
+
+- [🎯 Project Overview](#-project-overview)
+- [🚀 Key Features](#-key-features)
+- [🛠️ Technology Stack](#️-technology-stack)
+- [⚡ Quick Start](#-quick-start)
+- [🏗️ Project Structure](#️-project-structure)
+- [🔐 User Roles & Permissions](#-user-roles--permissions)
+  - [🎯 Application Flow & User Management](#-application-flow--user-management)
+  - [🛡️ Security Implementation](#️-security-implementation)
+- [🌐 API Documentation](#-api-documentation)
+- [🎨 UI/UX Features](#-uiux-features)ck employee management system built with Django REST Framework and React, featuring role-based access control, JWT authentication, and modern UI/UX design.
 
 ## 🎯 Project Overview
 
@@ -80,6 +91,12 @@ The system follows a **microservices-inspired architecture** with clear separati
 - **Hire Date Tracking** and employment status
 - **Department and Company Associations**
 - **Advanced Search and Filtering**
+- **📊 Employee Report** - Comprehensive report showing hired employees with:
+  - Employee details (name, email, mobile, position)
+  - Employment information (hired date, days employed)
+  - Company and department associations
+  - Sortable columns and search functionality
+  - Summary statistics and analytics
 
 ### 🏢 Company & Department Management
 - **Company Profiles** with descriptions and metadata
@@ -197,22 +214,99 @@ The system follows a **microservices-inspired architecture** with clear separati
 
 ## 🔐 User Roles & Permissions
 
-### Admin
-- Full access to all system features
-- Django admin dashboard access
-- User management capabilities
-- Complete CRUD operations on all entities
+### 🎯 Application Flow & User Management
 
-### Manager
-- Full CRUD operations on employees, companies, departments
-- Cannot access Django admin
-- Can manage organizational data
+**BrainWise** follows a hierarchical user management system with strict role-based access control:
 
-### Employee
-- Read-only access to system data
-- Can view employees, companies, departments
-- Cannot create, update, or delete records
-- Action buttons hidden in UI
+#### 🚀 Initial Setup Process
+
+1. **🏗️ System Administrator Setup**
+   ```bash
+   # First, create a Django superuser - this is mandatory
+   python manage.py createsuperuser
+   ```
+   - The **superuser** is the only user who can create initial accounts
+   - This superuser has full Django admin access
+   - This step is **required** before any other users can be created
+
+2. **👥 User Account Creation Hierarchy**
+   ```
+   Superuser (Django Admin) 
+   ↓ Creates
+   Admin Users 
+   ↓ Can Create
+   Manager & Employee Users
+   ```
+
+#### 👑 Superuser (System Administrator)
+- **Creation**: Created via Django command line (`python manage.py createsuperuser`)
+- **Permissions**: 
+  - Full system access including Django admin panel
+  - Can create, modify, and delete any user account
+  - Can perform all CRUD operations on all entities
+  - System configuration and maintenance access
+- **Responsibilities**: Initial system setup and user account management
+
+#### 🔧 Admin Role
+- **Creation**: Created by Superuser through Django admin interface
+- **Account Creation Rights**: ✅ **Can create new user accounts** (Managers and Employees)
+- **CRUD Operations**: Full access (Create, Read, Update, Delete) on:
+  - Companies
+  - Departments  
+  - Employees
+  - User accounts (limited to Manager and Employee roles)
+- **Django Admin Access**: ✅  access to Django admin panel
+- **UI Features**: All action buttons visible and functional
+
+#### 👔 Manager Role  
+- **Creation**: Created by Superuser or Admin
+- **Account Creation Rights**: ❌ **Cannot create user accounts**
+- **CRUD Operations**: Full access (Create, Read, Update, Delete) on:
+  - Companies
+  - Departments
+  - Employees
+- **Django Admin Access**: ❌ No access to Django admin panel
+- **UI Features**: All action buttons visible and functional
+- **Limitation**: Cannot manage user accounts or access system administration
+
+#### 👤 Employee Role
+- **Creation**: Created by Superuser or Admin  
+- **Account Creation Rights**: ❌ **Cannot create user accounts**
+- **CRUD Operations**: **Read-only access** to:
+  - Companies (View only)
+  - Departments (View only)
+  - Employees (View only)
+- **Django Admin Access**: ❌ No access to Django admin panel
+- **UI Features**: Action buttons (Add, Edit, Delete) are hidden
+- **Navigation**: Can browse and search data but cannot modify anything
+
+#### 📊 Employee Report Access
+- **Superuser**: ✅ Full access
+- **Admin**: ✅ Full access  
+- **Manager**: ✅ Full access
+- **Employee**: ✅ Read-only access (can view report but cannot export or modify)
+
+### 🔄 User Management Workflow
+
+```mermaid
+graph TD
+    A[System Setup] --> B[Create Superuser via CLI]
+    B --> C[Superuser logs into Django Admin]
+    C --> D[Superuser creates Admin users]
+    D --> E[Admin users log into Frontend]
+    E --> F[Admin creates Manager users]
+    E --> G[Admin creates Employee users]
+    F --> H[Manager logs in - Full CRUD access]
+    G --> I[Employee logs in - Read-only access]
+```
+
+### 🛡️ Security Implementation
+
+- **Authentication**: JWT tokens with 15-minute expiration
+- **Authorization**: Role-based permissions enforced on both frontend and backend
+- **UI Security**: Action buttons conditionally rendered based on user role
+- **API Security**: All endpoints protected with appropriate permission classes
+- **Token Management**: Automatic refresh with secure logout
 
 ## 🌐 API Documentation
 
@@ -229,6 +323,9 @@ The system follows a **microservices-inspired architecture** with clear separati
 - `GET/PUT/DELETE /api/core/departments/{id}/` - Department details
 - `GET/POST /api/core/employees/` - List/Create employees
 - `GET/PUT/DELETE /api/core/employees/{id}/` - Employee details
+
+### Report Endpoints
+- `GET /api/core/employees/report/` - **Employee Report** (hired employees only)
 
 ### Utility Endpoints
 - `GET /api/core/companies/{id}/departments/` - Company departments

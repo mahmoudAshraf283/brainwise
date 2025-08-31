@@ -1,22 +1,94 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import CompaniesList from './pages/companies/CompaniesList';
-import CompanyForm from './pages/companies/CompanyForm';
-import CompanyView from './pages/companies/CompanyView';
-import DepartmentsList from './pages/departments/DepartmentsList';
-import DepartmentForm from './pages/departments/DepartmentForm';
-import DepartmentView from './pages/departments/DepartmentView';
-import EmployeesList from './pages/employees/EmployeesList';
-import EmployeeForm from './pages/employees/EmployeeForm';
-import EmployeeView from './pages/employees/EmployeeView';
-import EmployeeReport from './pages/employees/EmployeeReport';
+// Lazy load page components
+const Login = React.lazy(() => import('./pages/Login'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const CompaniesList = React.lazy(() => import('./pages/companies/CompaniesList'));
+const CompanyForm = React.lazy(() => import('./pages/companies/CompanyForm'));
+const CompanyView = React.lazy(() => import('./pages/companies/CompanyView'));
+const DepartmentsList = React.lazy(() => import('./pages/departments/DepartmentsList'));
+const DepartmentForm = React.lazy(() => import('./pages/departments/DepartmentForm'));
+const DepartmentView = React.lazy(() => import('./pages/departments/DepartmentView'));
+const EmployeesList = React.lazy(() => import('./pages/employees/EmployeesList'));
+const EmployeeForm = React.lazy(() => import('./pages/employees/EmployeeForm'));
+const EmployeeView = React.lazy(() => import('./pages/employees/EmployeeView'));
+const EmployeeReport = React.lazy(() => import('./pages/employees/EmployeeReport'));
+
+// Preload critical components on app initialization
+const preloadCriticalComponents = () => {
+  // Preload Dashboard after a short delay (most likely next page after login)
+  setTimeout(() => {
+    import('./pages/Dashboard');
+  }, 100);
+  
+  // Preload frequently used components
+  setTimeout(() => {
+    import('./pages/employees/EmployeesList');
+    import('./pages/companies/CompaniesList');
+  }, 500);
+};
+
+// Initialize preloading
+preloadCriticalComponents();
+
+// Lazy Loading Error Boundary
+class LazyLoadErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Lazy loading error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '200px',
+          padding: '20px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ color: '#ef4444', marginBottom: '10px' }}>
+            Failed to load component
+          </h3>
+          <p style={{ color: '#6b7280', marginBottom: '15px' }}>
+            Please check your internet connection and try again.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '8px 16px',
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 // Loading component
 const LoadingSpinner = () => (
@@ -99,33 +171,43 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={
+              <LazyLoadErrorBoundary>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Login />
+                </Suspense>
+              </LazyLoadErrorBoundary>
+            } />
             <Route path="/*" element={
               <ProtectedRoute>
                 <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
                   <Navbar />
-                  <Routes>
-                    <Route index element={<Dashboard />} />
-                    
-                    {/* Company Routes */}
-                    <Route path="companies" element={<CompaniesList />} />
-                    <Route path="companies/new" element={<CompanyForm />} />
-                    <Route path="companies/:id" element={<CompanyView />} />
-                    <Route path="companies/:id/edit" element={<CompanyForm />} />
-                    
-                    {/* Department Routes */}
-                    <Route path="departments" element={<DepartmentsList />} />
-                    <Route path="departments/new" element={<DepartmentForm />} />
-                    <Route path="departments/:id" element={<DepartmentView />} />
-                    <Route path="departments/:id/edit" element={<DepartmentForm />} />
-                    
-                    {/* Employee Routes */}
-                    <Route path="employees" element={<EmployeesList />} />
-                    <Route path="employees/new" element={<EmployeeForm />} />
-                    <Route path="employees/report" element={<EmployeeReport />} />
-                    <Route path="employees/:id" element={<EmployeeView />} />
-                    <Route path="employees/:id/edit" element={<EmployeeForm />} />
-                  </Routes>
+                  <LazyLoadErrorBoundary>
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <Routes>
+                        <Route index element={<Dashboard />} />
+                        
+                        {/* Company Routes */}
+                        <Route path="companies" element={<CompaniesList />} />
+                        <Route path="companies/new" element={<CompanyForm />} />
+                        <Route path="companies/:id" element={<CompanyView />} />
+                        <Route path="companies/:id/edit" element={<CompanyForm />} />
+                        
+                        {/* Department Routes */}
+                        <Route path="departments" element={<DepartmentsList />} />
+                        <Route path="departments/new" element={<DepartmentForm />} />
+                        <Route path="departments/:id" element={<DepartmentView />} />
+                        <Route path="departments/:id/edit" element={<DepartmentForm />} />
+                        
+                        {/* Employee Routes */}
+                        <Route path="employees" element={<EmployeesList />} />
+                        <Route path="employees/new" element={<EmployeeForm />} />
+                        <Route path="employees/report" element={<EmployeeReport />} />
+                        <Route path="employees/:id" element={<EmployeeView />} />
+                        <Route path="employees/:id/edit" element={<EmployeeForm />} />
+                      </Routes>
+                    </Suspense>
+                  </LazyLoadErrorBoundary>
                 </div>
               </ProtectedRoute>
             } />
@@ -135,5 +217,15 @@ function App() {
     </ErrorBoundary>
   );
 }
+
+// Add CSS animation for loading spinners
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+document.head.appendChild(style);
 
 export default App;

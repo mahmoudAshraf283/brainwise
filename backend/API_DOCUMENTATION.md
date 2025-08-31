@@ -1,13 +1,40 @@
 # Employee Management System API Documentation
 
+## Initial Setup
+
+### Creating Superuser
+Before using the system, you must create a superuser account:
+
+```bash
+python manage.py createsuperuser
+```
+
+This superuser will be the only user who can initially create Admin and Manager accounts through the signup endpoint.
+
+## Application Flow
+
+### User Management Workflow
+1. **System Bootstrap**: Create superuser using Django management command
+2. **Account Creation**: Superuser creates initial Admin accounts
+3. **Delegation**: Admin users can create Manager and Employee accounts
+4. **Operations**: Different roles perform operations based on their permissions
+
+### Data Management Workflow
+1. **Companies**: Create companies first (Admin/Manager only)
+2. **Departments**: Create departments within companies (Admin/Manager only)
+3. **Employees**: Add employees to departments (Admin/Manager only)
+4. **Reports**: View employee reports (All authenticated users)
+
 ## Authentication
 All API endpoints require authentication using JWT tokens.
 
 ### Authentication Endpoints
-- `POST /api/accounts/signup/` - Register a new user
+- `POST /api/accounts/signup/` - Register a new user (Restricted to Superuser and Admin only)
 - `POST /api/accounts/login/` - Login and get tokens
 - `POST /api/accounts/logout/` - Logout and blacklist token
 - `POST /api/accounts/token/refresh/` - Refresh access token
+
+**Note**: User registration (`/signup/`) is restricted. Only Superuser and Admin roles can create new user accounts.
 
 ## Company Endpoints
 
@@ -64,6 +91,16 @@ All API endpoints require authentication using JWT tokens.
 - **GET** `/api/core/employees/?status={status}` - Filter by status
 - **POST** `/api/core/employees/` - Create a new employee
 
+### Employee Report
+- **GET** `/api/core/employees/report/` - Get detailed report of hired employees only
+
+**Features:**
+- Returns only employees with status 'hired'
+- Includes calculated days_employed field
+- Ordered by company, department, then employee name
+- Optimized with select_related for performance
+- Accessible to all authenticated users
+
 **Employee Status Options:**
 - `application_received`
 - `interview_scheduled`
@@ -95,6 +132,24 @@ All API endpoints require authentication using JWT tokens.
 - **PATCH** `/api/core/employees/{id}/` - Partial update employee
 - **DELETE** `/api/core/employees/{id}/` - Delete employee
 
+### Employee Report Response Format
+**Employee Report Response (Hired Employees Only):**
+```json
+[
+    {
+        "id": 1,
+        "employee_name": "John Doe",
+        "email_address": "john@example.com",
+        "mobile_number": "+1234567890",
+        "position": "Software Engineer",
+        "hired_on": "2024-01-15",
+        "days_employed": 227,
+        "company_name": "Tech Corp",
+        "department_name": "Engineering"
+    }
+]
+```
+
 ## Utility Endpoints
 
 ### Company Departments
@@ -102,15 +157,44 @@ All API endpoints require authentication using JWT tokens.
 
 ## Permissions
 
+### User Creation Flow
+1. **Superuser Creation**: Must be created via Django admin or management command
+   - Only superuser can create Admin and Manager accounts
+   - Superuser has full system access
+
+2. **Account Creation Hierarchy**:
+   - **Superuser** → Can create Admin and Manager accounts
+   - **Admin** → Can create other user accounts (Admin, Manager, Employee)
+   - **Manager** → Cannot create accounts (only CRUD operations)
+   - **Employee** → Read-only access
+
 ### Role-based Access Control
-- **Admin**: Full access to all operations
-- **Manager**: Full access to all operations
-- **Employee**: Read-only access to all data
+
+#### Superuser
+- Full system access
+- Can create Admin and Manager accounts
+- Can perform all CRUD operations
+- Django admin access
+
+#### Admin
+- Full CRUD operations on all entities (Companies, Departments, Employees)
+- Can create user accounts (Admin, Manager, Employee)
+- Cannot access Django admin
+
+#### Manager
+- Full CRUD operations on all entities (Companies, Departments, Employees)
+- **Cannot create user accounts**
+- Read/Write access to all data
+
+#### Employee
+- **Read-only access** to all data
+- Cannot create, update, or delete any records
+- Cannot create user accounts
 
 ### Authentication Requirements
 - All endpoints require valid JWT authentication
-- Different roles have different permission levels
-- Write operations are restricted to Admin and Manager roles
+- Write operations are restricted based on user role
+- Account creation is restricted to Superuser and Admin roles only
 
 ## Error Handling
 
