@@ -301,6 +301,15 @@ class ApiService {
     }
   }
 
+  async getEmployeeReport() {
+    try {
+      const response = await api.get('/core/employees/report/');
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to fetch employee report');
+    }
+  }
+
   // Utility methods
   async getCompanyDepartments(companyId) {
     try {

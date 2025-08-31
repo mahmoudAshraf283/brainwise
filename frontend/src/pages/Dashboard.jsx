@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/apiService';
 
@@ -124,6 +125,88 @@ const Dashboard = () => {
               {user?.role}
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* Quick Actions Section */}
+      <div style={{
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        marginTop: '20px'
+      }}>
+        <h2 style={{ 
+          margin: '0 0 20px 0', 
+          fontSize: '20px', 
+          fontWeight: 'bold',
+          paddingBottom: '10px',
+          borderBottom: '1px solid #e2e8f0'
+        }}>
+          Quick Actions
+        </h2>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '15px'
+        }}>
+          <Link 
+            to="/employees/report" 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '15px',
+              backgroundColor: '#10b981',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => e.target.style.backgroundColor = '#059669'}
+            onMouseOut={(e) => e.target.style.backgroundColor = '#10b981'}
+          >
+            📊 View Employee Report
+          </Link>
+          <Link 
+            to="/employees" 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '15px',
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => e.target.style.backgroundColor = '#2563eb'}
+            onMouseOut={(e) => e.target.style.backgroundColor = '#3b82f6'}
+          >
+            👥 Manage Employees
+          </Link>
+          <Link 
+            to="/companies" 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '15px',
+              backgroundColor: '#f59e0b',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => e.target.style.backgroundColor = '#d97706'}
+            onMouseOut={(e) => e.target.style.backgroundColor = '#f59e0b'}
+          >
+            🏢 Manage Companies
+          </Link>
         </div>
       </div>
     </div>

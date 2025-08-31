@@ -259,3 +259,18 @@ class DepartmentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
         fields = ['id', 'department_name']
+
+
+class EmployeeReportSerializer(serializers.ModelSerializer):
+    """Serializer for Employee Report showing hired employees """
+    company_name = serializers.CharField(source='company.company_name', read_only=True)
+    department_name = serializers.CharField(source='department.department_name', read_only=True)
+    days_employed = serializers.ReadOnlyField()
+    position = serializers.CharField(source='designation', read_only=True)
+
+    class Meta:
+        model = Employee
+        fields = [
+            'id', 'employee_name', 'email_address', 'mobile_number',
+            'position', 'hired_on', 'days_employed', 'company_name', 'department_name'
+        ]

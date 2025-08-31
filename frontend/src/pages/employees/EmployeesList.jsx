@@ -244,16 +244,29 @@ const EmployeesList = () => {
         <div>
           <h1 style={titleStyle}>Employees</h1>
         </div>
-        {(user?.role === 'admin' || user?.role === 'manager') && (
+        <div style={{ display: 'flex', gap: '12px' }}>
           <Link 
-            to="/employees/new" 
-            style={addButtonStyle}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#2563eb'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#3b82f6'}
+            to="/employees/report" 
+            style={{
+              ...addButtonStyle,
+              backgroundColor: '#10b981',
+            }}
+            onMouseOver={(e) => e.target.style.backgroundColor = '#059669'}
+            onMouseOut={(e) => e.target.style.backgroundColor = '#10b981'}
           >
-            ➕ Add Employee
+            📊 Employee Report
           </Link>
-        )}
+          {(user?.role === 'admin' || user?.role === 'manager') && (
+            <Link 
+              to="/employees/new" 
+              style={addButtonStyle}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#2563eb'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#3b82f6'}
+            >
+              ➕ Add Employee
+            </Link>
+          )}
+        </div>
       </div>
 
       {error && (

@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from .models import Company, Department, Employee
 from .serializers import (
     CompanySerializer, DepartmentSerializer, EmployeeSerializer,
-    EmployeeListSerializer, DepartmentListSerializer
+    EmployeeListSerializer, DepartmentListSerializer, EmployeeReportSerializer
 )
 from .permissions import IsAdminOrManager, IsAdminOnly
 
@@ -252,4 +252,19 @@ def company_departments(request, company_id):
         return Response(
             {'error': f'Failed to fetch departments: {str(e)}'},
             status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+# Employee Report View
+class EmployeeReportView(generics.ListAPIView):
+    """View to get detailed report of hired employees"""
+    serializer_class = EmployeeReportSerializer
+    permission_classes = [IsAuthenticated, IsAdminOrManager]
+    
+    def get_queryset(self):
+        """Return only hired employees with related company and department data"""
+        return Employee.objects.filter(
+            employee_status='hired'
+        ).select_related('company', 'department').order_by(
+            'company__company_name', 'department__department_name', 'employee_name'
         )

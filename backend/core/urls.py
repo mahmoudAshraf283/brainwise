@@ -3,7 +3,7 @@ from .views import (
     CompanyListCreateView, CompanyDetailView,
     DepartmentListCreateView, DepartmentDetailView,
     EmployeeListCreateView, EmployeeDetailView,
-    company_departments
+    company_departments, EmployeeReportView
 )
 
 urlpatterns = [
@@ -18,6 +18,9 @@ urlpatterns = [
     # Employee URLs
     path('employees/', EmployeeListCreateView.as_view(), name='employee-list-create'),
     path('employees/<int:pk>/', EmployeeDetailView.as_view(), name='employee-detail'),
+    
+    # Reports URLs
+    path('employees/report/', EmployeeReportView.as_view(), name='employee-report'),
     
     # Utility URLs
     path('companies/<int:company_id>/departments/', company_departments, name='company-departments'),

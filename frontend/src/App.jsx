@@ -16,6 +16,7 @@ import DepartmentView from './pages/departments/DepartmentView';
 import EmployeesList from './pages/employees/EmployeesList';
 import EmployeeForm from './pages/employees/EmployeeForm';
 import EmployeeView from './pages/employees/EmployeeView';
+import EmployeeReport from './pages/employees/EmployeeReport';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -121,6 +122,7 @@ function App() {
                     {/* Employee Routes */}
                     <Route path="employees" element={<EmployeesList />} />
                     <Route path="employees/new" element={<EmployeeForm />} />
+                    <Route path="employees/report" element={<EmployeeReport />} />
                     <Route path="employees/:id" element={<EmployeeView />} />
                     <Route path="employees/:id/edit" element={<EmployeeForm />} />
                   </Routes>
